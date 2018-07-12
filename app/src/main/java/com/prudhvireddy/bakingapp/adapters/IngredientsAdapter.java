@@ -16,19 +16,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-
 public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.IngredientsViewHolder> {
     private final List<IngredientsModel> list;
     private final Context context;
 
-    public IngredientsAdapter(List<IngredientsModel> list,Context context){
-        this.list=list;
-        this.context=context;
+    public IngredientsAdapter(List<IngredientsModel> list, Context context) {
+        this.list = list;
+        this.context = context;
     }
 
     @Override
     public IngredientsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ingredient_model,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ingredient_model, parent, false);
         return new IngredientsViewHolder(v);
     }
 
@@ -46,12 +45,16 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
 
 
     public class IngredientsViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ingredient_name)TextView iname;
-        @BindView(R.id.ingredient_quantity)TextView iquantity;
-        @BindView(R.id.ingredient_measure)TextView imeasure;
+        @BindView(R.id.ingredient_name)
+        TextView iname;
+        @BindView(R.id.ingredient_quantity)
+        TextView iquantity;
+        @BindView(R.id.ingredient_measure)
+        TextView imeasure;
+
         IngredientsViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

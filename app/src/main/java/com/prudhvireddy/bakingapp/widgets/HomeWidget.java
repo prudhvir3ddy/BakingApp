@@ -21,12 +21,12 @@ public class HomeWidget extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.home_widget);
             Intent intent = new Intent(context, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
-            remoteViews.setOnClickPendingIntent(R.id.appwidget_text,pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            remoteViews.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
 
-            Intent intent1 = new Intent(context,WidgetService.class);
-            remoteViews.setRemoteAdapter(R.id.widgetlistview,intent1);
-            appWidgetManager.updateAppWidget(appWidgetId,remoteViews);
+            Intent intent1 = new Intent(context, WidgetService.class);
+            remoteViews.setRemoteAdapter(R.id.widgetlistview, intent1);
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
     }
 

@@ -21,9 +21,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class IngredientsFragement extends Fragment{
+public class IngredientsFragement extends Fragment {
     @BindView(R.id.ingredients_recyclerview)
-     RecyclerView recyclerView;
+    RecyclerView recyclerView;
     private IngredientsAdapter adapter;
     private List<IngredientsModel> list;
     private static final String LIST_CONSTANT = "list";
@@ -35,23 +35,23 @@ public class IngredientsFragement extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.ingredients_fragment,container,false);
-        ButterKnife.bind(this,rootView);
+        View rootView = inflater.inflate(R.layout.ingredients_fragment, container, false);
+        ButterKnife.bind(this, rootView);
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        if (savedInstanceState!=null){
+        if (savedInstanceState != null) {
             list = savedInstanceState.getParcelableArrayList(LIST_CONSTANT);
-            adapter = new IngredientsAdapter(list,getContext());
+            adapter = new IngredientsAdapter(list, getContext());
             recyclerView.setAdapter(adapter);
-        }else {
-            adapter = new IngredientsAdapter(list,getContext());
+        } else {
+            adapter = new IngredientsAdapter(list, getContext());
             recyclerView.setAdapter(adapter);
         }
         return rootView;
     }
 
-    public void setList(ArrayList<IngredientsModel> models){
-        list=models;
+    public void setList(ArrayList<IngredientsModel> models) {
+        list = models;
     }
 
     @Override

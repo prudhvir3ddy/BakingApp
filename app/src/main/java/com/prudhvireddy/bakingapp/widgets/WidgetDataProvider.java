@@ -13,11 +13,14 @@ import com.prudhvireddy.bakingapp.models.MainModel;
 import com.prudhvireddy.bakingapp.utils.Urls;
 
 import java.util.ArrayList;
+
 import static com.prudhvireddy.bakingapp.activities.MainActivity.list;
+
 class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     private final Context context;
+
     public WidgetDataProvider(Context context) {
-        this.context=context;
+        this.context = context;
     }
 
     @Override
@@ -26,19 +29,20 @@ class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     }
 
     @Override
-    public void onDataSetChanged(){
+    public void onDataSetChanged() {
         fetchData();
     }
 
-    private void fetchData(){
+    private void fetchData() {
         AndroidNetworking.get(Urls.url)
                 .setPriority(Priority.HIGH)
                 .build()
-                .getAsObjectList(MainModel.class,new ParsedRequestListener<ArrayList<MainModel>>(){
+                .getAsObjectList(MainModel.class, new ParsedRequestListener<ArrayList<MainModel>>() {
                     @Override
                     public void onResponse(ArrayList<MainModel> response) {
                         list = response;
                     }
+
                     @Override
                     public void onError(ANError anError) {
                     }
@@ -58,15 +62,15 @@ class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetmodel);
-        remoteViews.setTextViewText(R.id.recipe_name,list.get(position).getHome_name());
+        remoteViews.setTextViewText(R.id.recipe_name, list.get(position).getHome_name());
         remoteViews.removeAllViews(R.id.ingerdient_list);
-        for (int i=0;i<list.get(position).getIngredients().size();i++){
-            RemoteViews  ingredient= new RemoteViews(context.getPackageName(), R.layout.widget_ingredient_list);
-            ingredient.setTextViewText(R.id.ingredient,list.get(position).getIngredients().get(i).getIngredient());
-            ingredient.setTextViewText(R.id.measure,list.get(position).getIngredients().get(i).getMeasure());
-            ingredient.setTextViewText(R.id.quantity,list.get(position).getIngredients().get(i).getQuantity()+"");
+        for (int i = 0; i < list.get(position).getIngredients().size(); i++) {
+            RemoteViews ingredient = new RemoteViews(context.getPackageName(), R.layout.widget_ingredient_list);
+            ingredient.setTextViewText(R.id.ingredient, list.get(position).getIngredients().get(i).getIngredient());
+            ingredient.setTextViewText(R.id.measure, list.get(position).getIngredients().get(i).getMeasure());
+            ingredient.setTextViewText(R.id.quantity, list.get(position).getIngredients().get(i).getQuantity() + "");
 
-            remoteViews.addView(R.id.ingerdient_list,ingredient);
+            remoteViews.addView(R.id.ingerdient_list, ingredient);
         }
         return remoteViews;
     }

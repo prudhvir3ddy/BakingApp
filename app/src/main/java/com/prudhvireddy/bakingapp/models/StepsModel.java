@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class StepsModel implements Parcelable{
+public class StepsModel implements Parcelable {
     @SerializedName("id")
     @Expose
     private String id;

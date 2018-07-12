@@ -13,7 +13,6 @@ import com.prudhvireddy.bakingapp.models.StepsModel;
 import java.util.ArrayList;
 
 
-
 public class DetailsActivity extends AppCompatActivity {
 
     private ArrayList<IngredientsModel> ingredientsList;
@@ -24,24 +23,24 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        FragmentManager fragmentManager= getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         ingredientsList = getIntent().getExtras().getParcelableArrayList("ingredient_bundle");
         stepsList = getIntent().getExtras().getParcelableArrayList("steps_bundle");
 
-        if (stepsList != null){
+        if (stepsList != null) {
             VideosFragment videosFragment = new VideosFragment();
-            videosFragment.setPosition(getIntent().getIntExtra("position",0));
+            videosFragment.setPosition(getIntent().getIntExtra("position", 0));
             videosFragment.setStepList(stepsList);
             fragmentManager.beginTransaction()
                     .replace(R.id.details_frame, videosFragment)
                     .commit();
-        } else if(savedInstanceState == null){
+        } else if (savedInstanceState == null) {
             IngredientsFragement ingredientsFragement = new IngredientsFragement();
             ingredientsFragement.setList(ingredientsList);
             fragmentManager.beginTransaction()
-                    .replace(R.id.details_frame,ingredientsFragement)
+                    .replace(R.id.details_frame, ingredientsFragement)
                     .commit();
-        }else {
+        } else {
             fragmentManager.findFragmentById(R.id.details_frame);
         }
 

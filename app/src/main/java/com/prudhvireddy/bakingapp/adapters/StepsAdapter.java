@@ -11,6 +11,7 @@ import com.prudhvireddy.bakingapp.R;
 import com.prudhvireddy.bakingapp.models.StepsModel;
 
 import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -19,13 +20,13 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     private final Context context;
 
     public StepsAdapter(ArrayList<StepsModel> list, Context context) {
-        this.stepsModelList=list;
-        this.context=context;
+        this.stepsModelList = list;
+        this.context = context;
     }
 
     @Override
     public StepsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_recycler_model,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.steps_recycler_model, parent, false);
         return new StepsViewHolder(view);
     }
 
@@ -41,10 +42,12 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
 
     public class StepsViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.step_short_description)TextView shortdescription;
+        @BindView(R.id.step_short_description)
+        TextView shortdescription;
+
         StepsViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

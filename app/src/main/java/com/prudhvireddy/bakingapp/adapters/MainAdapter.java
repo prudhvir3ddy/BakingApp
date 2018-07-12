@@ -19,20 +19,20 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     private final List<MainModel> list;
     private final Context context;
 
-    public MainAdapter(List<MainModel> list, Context context){
-        this.list=list;
-        this.context=context;
+    public MainAdapter(List<MainModel> list, Context context) {
+        this.list = list;
+        this.context = context;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.main_recyclerview_model,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.main_recyclerview_model, parent, false);
         return new ViewHolder(v);
     }
 
@@ -41,9 +41,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         holder.name.setText(list.get(position).getHome_name());
 
         String url = list.get(position).getImage();
-        if (url==null || url.equals("")){
+        if (url == null || url.equals("")) {
             holder.imageView.setImageResource(R.drawable.ic_food_placeholder);
-        }else {
+        } else {
             Glide.with(context).load(url).placeholder(R.drawable.ic_food_placeholder).error(R.drawable.ic_food_placeholder).into(holder.imageView);
         }
 
@@ -62,9 +62,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>{
         TextView name;
         @BindView(R.id.recipe_imageview)
         ImageView imageView;
+
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
 
         }
     }
