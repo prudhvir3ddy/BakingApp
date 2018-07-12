@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Baking App</string>
+    <string name="stepslabel">Steps</string>
+    <string name="previousvideo">Previous</string>
+    <string name="nextvideo">Next</string>
+    <string name="viewingridients">View Ingredients</string>
+    <string name="mainimagerecipe">MainImageRecipe</string>
+</resources>
