@@ -27,7 +27,8 @@ public class DetailsActivity extends AppCompatActivity {
         ingredientsList = getIntent().getExtras().getParcelableArrayList("ingredient_bundle");
         stepsList = getIntent().getExtras().getParcelableArrayList("steps_bundle");
 
-        if (stepsList != null) {
+        if (stepsList != null && savedInstanceState == null) {
+
             VideosFragment videosFragment = new VideosFragment();
             videosFragment.setPosition(getIntent().getIntExtra("position", 0));
             videosFragment.setStepList(stepsList);
@@ -35,12 +36,14 @@ public class DetailsActivity extends AppCompatActivity {
                     .replace(R.id.details_frame, videosFragment)
                     .commit();
         } else if (savedInstanceState == null) {
+
             IngredientsFragement ingredientsFragement = new IngredientsFragement();
             ingredientsFragement.setList(ingredientsList);
             fragmentManager.beginTransaction()
                     .replace(R.id.details_frame, ingredientsFragement)
                     .commit();
         } else {
+
             fragmentManager.findFragmentById(R.id.details_frame);
         }
 

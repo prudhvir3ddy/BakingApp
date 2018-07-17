@@ -12,14 +12,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -47,6 +50,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
+    private static final String PLAYER_POSITION = "PLAYER_POSITION";
     @BindView(R.id.playerView)
     SimpleExoPlayerView simpleExoPlayerView;
     @BindView(R.id.description)
@@ -64,11 +68,16 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     private int position;
     private static final String LIST_INDEX = "position";
     private static final String STEP_ID_LIST = "step";
+    @BindView(R.id.thumbnail)
+    ImageView thumbnail;
+
+
     private SimpleExoPlayer player;
 
     private static MediaSessionCompat mediaSession;
     private PlaybackStateCompat.Builder stateBuilder;
-
+    long play_position;
+    private Uri video_uri;
     public VideosFragment() {
     }
 
@@ -78,19 +87,37 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
         View rootView = inflater.inflate(R.layout.video_fragment,container,false);
         ButterKnife.bind(this,rootView);
 
+        if (savedInstanceState != null) {
+            play_position = savedInstanceState.getLong(PLAYER_POSITION);
+            position = savedInstanceState.getInt(LIST_INDEX);
+            list = savedInstanceState.getParcelableArrayList(STEP_ID_LIST);
+            Log.v("player_position", "" + play_position);
+        } else
+            play_position = 0;
+
         if (list != null) {
 
+
+            Log.v("test", "nothing");
             simpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
                     (getResources(), R.drawable.video_placeholder));
 
-            initializeMediaSession();
-            initializePlayer(Uri.parse(list.get(position).getVideoURL()));
 
+            initializeMediaSession();
+            Log.v("player_position2", "" + play_position);
+            video_uri = Uri.parse(list.get(position).getVideoURL());
+            Log.v("player_position3", "" + play_position); //
+            initializePlayer(video_uri);
+            Log.v("player_position4", "" + play_position);
             title.setText(list.get(position).getShortDescription());
             description.setText(list.get(position).getDescription());
 
 
+            Glide.with(getContext()).load(list.get(position).getThumbnailURL()).placeholder(R.drawable.ic_food_placeholder)
+                    .error(R.drawable.nothumb).into(thumbnail);
+
         }
+
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,8 +140,10 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
             position--;
         }
         releasePlayer();
-        initializePlayer(Uri.parse(list.get(position).getVideoURL()));
+        video_uri = Uri.parse(list.get(position).getVideoURL());
+        initializePlayer(video_uri);
         description.setText(list.get(position).getDescription());
+
 
     }
     
@@ -125,14 +154,15 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
             Toast.makeText(getContext(),"No more next steps",Toast.LENGTH_SHORT).show();
         }
         releasePlayer();
-        initializePlayer(Uri.parse(list.get(position).getVideoURL()));
+        video_uri = Uri.parse(list.get(position).getVideoURL());
+        initializePlayer(video_uri);
         description.setText(list.get(position).getDescription());
 
     }
 
     private void initializeMediaSession() {
 
-        mediaSession = new MediaSessionCompat(getContext(),"VideFragment");
+        mediaSession = new MediaSessionCompat(getContext(), "VideoFragment");
 
         mediaSession.setFlags(
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
@@ -164,6 +194,8 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
             player.addListener(this);
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             MediaSource mediaSource = new ExtractorMediaSource(videoURL, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            Log.v("player_init", "" + play_position);
+            player.seekTo(play_position);
             player.prepare(mediaSource);
             player.setPlayWhenReady(true);
         }
@@ -174,22 +206,31 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     }
 
     public void setStepList(ArrayList<StepsModel> stepList) {
-        this.list = stepList;
+        list = stepList;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
         outState.putParcelableArrayList(STEP_ID_LIST, (ArrayList<? extends Parcelable>) list);
         outState.putInt(LIST_INDEX, position);
+        outState.putLong(PLAYER_POSITION, play_position);
+
     }
+
     @Override
     public void onResume() {
         super.onResume();
+        if (video_uri != null)
+            initializePlayer(video_uri);
+        //player.setPlayWhenReady(false);
     }
     @Override
     public void onPause(){
         super.onPause();
+        play_position = Math.max(0, player.getCurrentPosition());
+        Log.v("play_pause", "" + play_position);
         releasePlayer();
         if (mediaSession != null) {
             mediaSession.setActive(false);
@@ -199,6 +240,7 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     @Override
     public void onStop(){
         super.onStop();
+        // player_position=Math.max(0,player.getCurrentPosition());
         releasePlayer();
         if (mediaSession != null) {
             mediaSession.setActive(false);
@@ -208,6 +250,7 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        //player_position=Math.max(0,player.getCurrentPosition());
         releasePlayer();
         if (mediaSession != null) {
             mediaSession.setActive(false);

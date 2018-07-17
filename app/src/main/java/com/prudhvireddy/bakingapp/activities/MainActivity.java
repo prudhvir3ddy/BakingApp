@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 MainModel recipe = list.get(position);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("data", recipe);
+                bundle.putInt("position", position);
                 Intent intent = new Intent(MainActivity.this, ListActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);

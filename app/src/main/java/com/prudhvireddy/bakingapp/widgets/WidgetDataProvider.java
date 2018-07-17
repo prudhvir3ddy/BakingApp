@@ -1,6 +1,8 @@
 package com.prudhvireddy.bakingapp.widgets;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -9,38 +11,59 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.prudhvireddy.bakingapp.R;
+import com.prudhvireddy.bakingapp.activities.MainActivity;
+import com.prudhvireddy.bakingapp.models.IngredientsModel;
 import com.prudhvireddy.bakingapp.models.MainModel;
+import com.prudhvireddy.bakingapp.utils.Constants;
 import com.prudhvireddy.bakingapp.utils.Urls;
 
 import java.util.ArrayList;
 
-import static com.prudhvireddy.bakingapp.activities.MainActivity.list;
 
 class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     private final Context context;
-
+    ArrayList<IngredientsModel> list;
+    int pos;
     public WidgetDataProvider(Context context) {
         this.context = context;
     }
 
     @Override
     public void onCreate() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE);
+        pos = sharedPreferences.getInt(Constants.RECEIPE_POSITION, -1);
+        Log.v("on create provider", pos + "");
+        list = new ArrayList<>();
+        if (MainActivity.list.size() != 0) {
+            list = MainActivity.list.get(pos).getIngredients();
+        } else {
+            fetchData();
+        }
 
     }
 
     @Override
     public void onDataSetChanged() {
-        fetchData();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE);
+        pos = sharedPreferences.getInt(Constants.RECEIPE_POSITION, -1);
+        if (MainActivity.list.size() != 0) {
+            list = MainActivity.list.get(pos).getIngredients();
+        } else {
+            fetchData();
+        }
+
     }
 
     private void fetchData() {
+
         AndroidNetworking.get(Urls.url)
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsObjectList(MainModel.class, new ParsedRequestListener<ArrayList<MainModel>>() {
                     @Override
                     public void onResponse(ArrayList<MainModel> response) {
-                        list = response;
+                        list.clear();
+                        list = response.get(pos).getIngredients();
                     }
 
                     @Override
@@ -61,17 +84,17 @@ class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int position) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetmodel);
-        remoteViews.setTextViewText(R.id.recipe_name, list.get(position).getHome_name());
-        remoteViews.removeAllViews(R.id.ingerdient_list);
-        for (int i = 0; i < list.get(position).getIngredients().size(); i++) {
-            RemoteViews ingredient = new RemoteViews(context.getPackageName(), R.layout.widget_ingredient_list);
-            ingredient.setTextViewText(R.id.ingredient, list.get(position).getIngredients().get(i).getIngredient());
-            ingredient.setTextViewText(R.id.measure, list.get(position).getIngredients().get(i).getMeasure());
-            ingredient.setTextViewText(R.id.quantity, list.get(position).getIngredients().get(i).getQuantity() + "");
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_ingredient_list);
 
-            remoteViews.addView(R.id.ingerdient_list, ingredient);
-        }
+
+        remoteViews.setTextViewText(R.id.ingredient, list.get(position).getIngredient());
+        remoteViews.setTextViewText(R.id.measure, list.get(position).getMeasure());
+        remoteViews.setTextViewText(R.id.quantity, list.get(position).getQuantity() + "");
+
+
+
+
+
         return remoteViews;
     }
 
@@ -82,7 +105,7 @@ class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getViewTypeCount() {
-        return 2;
+        return 1;
     }
 
     @Override
