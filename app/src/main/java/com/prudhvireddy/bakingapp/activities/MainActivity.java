@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -17,6 +18,7 @@ import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.prudhvireddy.bakingapp.R;
 import com.prudhvireddy.bakingapp.adapters.MainAdapter;
 import com.prudhvireddy.bakingapp.models.MainModel;
+import com.prudhvireddy.bakingapp.utils.Connection;
 import com.prudhvireddy.bakingapp.utils.OnItemTouchListener;
 import com.prudhvireddy.bakingapp.utils.Urls;
 
@@ -67,8 +69,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }));
-        getData();
-
+        Connection connection = new Connection(getApplicationContext());
+        if (connection.isInternet()) {
+            getData();
+        } else {
+            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getData() {

@@ -81,6 +81,62 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     public VideosFragment() {
     }
 
+    private static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
+
+    private void previousStep() {
+        if (position == 0) {
+            Toast.makeText(getContext(), "No previous step", Toast.LENGTH_SHORT).show();
+        } else {
+            position--;
+        }
+        releasePlayer();
+        video_uri = Uri.parse(list.get(position).getVideoURL());
+        initializePlayer(video_uri);
+        description.setText(list.get(position).getDescription());
+
+
+    }
+
+    private void nextstep() {
+        if (position < list.size() - 1) {
+            position++;
+        } else {
+            Toast.makeText(getContext(), "No more next steps", Toast.LENGTH_SHORT).show();
+        }
+        releasePlayer();
+        video_uri = Uri.parse(list.get(position).getVideoURL());
+        initializePlayer(video_uri);
+        description.setText(list.get(position).getDescription());
+
+    }
+
+    private void initializeMediaSession() {
+
+        mediaSession = new MediaSessionCompat(getContext(), "VideoFragment");
+
+        mediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mediaSession.setMediaButtonReceiver(null);
+
+        stateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+        mediaSession.setPlaybackState(stateBuilder.build());
+
+        mediaSession.setCallback(new MySessionCallback());
+
+
+        mediaSession.setActive(true);
+    }
+
+    boolean playWhenReady;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -91,6 +147,7 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
             play_position = savedInstanceState.getLong(PLAYER_POSITION);
             position = savedInstanceState.getInt(LIST_INDEX);
             list = savedInstanceState.getParcelableArrayList(STEP_ID_LIST);
+            playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY);
             Log.v("player_position", "" + play_position);
         } else
             play_position = 0;
@@ -132,58 +189,6 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
         });
         return rootView;
     }
-    
-    private void previousStep(){
-        if (position == 0) {
-            Toast.makeText(getContext(),"No previous step",Toast.LENGTH_SHORT).show();
-        }else{
-            position--;
-        }
-        releasePlayer();
-        video_uri = Uri.parse(list.get(position).getVideoURL());
-        initializePlayer(video_uri);
-        description.setText(list.get(position).getDescription());
-
-
-    }
-    
-    private void nextstep(){
-        if (position < list.size() - 1){
-            position++;
-        }else{
-            Toast.makeText(getContext(),"No more next steps",Toast.LENGTH_SHORT).show();
-        }
-        releasePlayer();
-        video_uri = Uri.parse(list.get(position).getVideoURL());
-        initializePlayer(video_uri);
-        description.setText(list.get(position).getDescription());
-
-    }
-
-    private void initializeMediaSession() {
-
-        mediaSession = new MediaSessionCompat(getContext(), "VideoFragment");
-
-        mediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        mediaSession.setMediaButtonReceiver(null);
-
-        stateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mediaSession.setPlaybackState(stateBuilder.build());
-
-        mediaSession.setCallback(new MySessionCallback());
-
-
-        mediaSession.setActive(true);
-    }
 
     private void initializePlayer(Uri videoURL) {
         if (player == null) {
@@ -197,7 +202,14 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
             Log.v("player_init", "" + play_position);
             player.seekTo(play_position);
             player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(playWhenReady);
+        }
+    }
+
+    private void saveState() {
+        if (player != null) {
+            playWhenReady = player.getPlayWhenReady();
+            play_position = Math.max(0, player.getCurrentPosition());
         }
     }
 
@@ -216,7 +228,7 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
         outState.putParcelableArrayList(STEP_ID_LIST, (ArrayList<? extends Parcelable>) list);
         outState.putInt(LIST_INDEX, position);
         outState.putLong(PLAYER_POSITION, play_position);
-
+        outState.putBoolean(PLAY_WHEN_READY, playWhenReady);
     }
 
     @Override
@@ -321,6 +333,7 @@ public class VideosFragment extends Fragment implements ExoPlayer.EventListener{
     }
 
     private void releasePlayer() {
+        saveState();
         if (player != null) {
             player.stop();
             player.release();
